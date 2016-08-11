@@ -18,7 +18,7 @@ http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
 
     <!-- 网站安全的语法 -->
     <http auto-config='true' access-decision-manager-ref="accessDecisionManager" use-expressions="true">
-        <logout logout-url="/logout" invalidate-session="true" delete-cookies="JSESSIONID" logout-success-url="/login" />
+        <logout logout-url="/j_spring_security_logout" invalidate-session="true" delete-cookies="JSESSIONID" logout-success-url="/login" />
 
         <form-login default-target-url="/main" login-page="/login" authentication-failure-url="/login?error=1"
                     login-processing-url="/j_spring_security_check"  password-parameter="password"
@@ -39,7 +39,7 @@ http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
 
         <session-management invalid-session-url="/timeout"
                             session-fixation-protection="changeSessionId"> <!-- Session完成(Session Fixation)攻击保护 -->
-            <concurrency-control  max-sessions="1"
+            <concurrency-control  max-sessions="1" expired-url="/timeout"
                                  session-registry-ref="sessionRegistry" />
         </session-management>
 
