@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.UserRoleMapper">
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	role,	securityuser
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.example.domain.UserRole" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM t_user_role
+		 WHERE id = #{id}
+	</select>
+	<select id="selectByMap" resultType="com.example.domain.UserRole">
+		select a.id,b.id as userid,b.username,b.full_name as fullname,c.id as rid,c.name
+		from t_user_role a,t_user b, t_role c where a.securityuser = b.id and a.role = c.id
+
+		<if test="securityUser != null">
+			and securityuser = #{securityUser.id}
+		</if>
+
+		<if test="role != null">
+			and role = #{role.id}
+		</if>
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM t_user_role
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.example.domain.UserRole">
+		 INSERT INTO t_user_role
+ 		(id,role,securityuser) 
+		 VALUES 
+ 		(#{id},#{role},#{securityuser}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.example.domain.UserRole">
+		 INSERT INTO t_user_role
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="role != null">
+				 role,
+			</if>
+			<if test="securityuser != null">
+				 securityuser,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="role!=null">
+				 #{role},
+			</if>
+			<if test="securityuser!=null">
+				 #{securityuser},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.example.domain.UserRole">
+		 UPDATE t_user_role
+ 		 <set> 
+			<if test="role != null">
+				 role = #{role},
+			</if>
+			<if test="securityuser != null">
+				 securityuser = #{securityuser},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.example.domain.UserRole">
+		 UPDATE t_user_role
+		 SET 
+			 role = #{role},
+			 securityuser = #{securityuser}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>

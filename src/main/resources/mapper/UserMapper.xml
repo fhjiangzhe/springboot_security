@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.UserMapper">
+	
+	<resultMap id="baseUserMap" type="com.example.domain.AclUser">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="account_enabled" property="accountEnabled" jdbcType="INTEGER" />
+		<result column="account_locked" property="accountLocked" jdbcType="INTEGER" />
+		<result column="credentials_expired" property="credentialsExpired" jdbcType="INTEGER" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="full_name" property="fullName" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="user_mgr_type" property="userMgrType" jdbcType="INTEGER" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="org" property="org" jdbcType="BIGINT"/>
+		<result column="expired_date" property="expiredDate" jdbcType="VARCHAR"/>
+ 	</resultMap>
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	account_enabled,	account_locked,	credentials_expired,	description,	full_name,	mobile,	password,	user_mgr_type,	username,	org,	expired_date
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultMap="baseUserMap" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM t_user
+		 WHERE id = #{id}
+	</select>
+	<select id="findByName" resultType="com.example.domain.AclUser">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM t_user
+		WHERE username = #{username}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM t_user
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="AclUser">
+		 INSERT INTO t_user
+ 		(id,account_enabled,account_locked,credentials_expired,description,full_name,mobile,password,user_mgr_type,username,org,expired_date) 
+		 VALUES 
+ 		(#{id},#{accountEnabled},#{accountLocked},#{credentialsExpired},#{description},#{fullName},#{mobile},#{password},#{userMgrType},#{username},#{org},#{expiredDate}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="AclUser">
+		 INSERT INTO t_user
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="accountEnabled != null">
+				 account_enabled,
+			</if>
+			<if test="accountLocked != null">
+				 account_locked,
+			</if>
+			<if test="credentialsExpired != null">
+				 credentials_expired,
+			</if>
+			<if test="description != null">
+				 description,
+			</if>
+			<if test="fullName != null">
+				 full_name,
+			</if>
+			<if test="mobile != null">
+				 mobile,
+			</if>
+			<if test="password != null">
+				 password,
+			</if>
+			<if test="userMgrType != null">
+				 user_mgr_type,
+			</if>
+			<if test="username != null">
+				 username,
+			</if>
+			<if test="org != null">
+				 org,
+			</if>
+			<if test="expiredDate != null">
+				 expired_date,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="accountEnabled!=null">
+				 #{accountEnabled},
+			</if>
+			<if test="accountLocked!=null">
+				 #{accountLocked},
+			</if>
+			<if test="credentialsExpired!=null">
+				 #{credentialsExpired},
+			</if>
+			<if test="description!=null">
+				 #{description},
+			</if>
+			<if test="fullName!=null">
+				 #{fullName},
+			</if>
+			<if test="mobile!=null">
+				 #{mobile},
+			</if>
+			<if test="password!=null">
+				 #{password},
+			</if>
+			<if test="userMgrType!=null">
+				 #{userMgrType},
+			</if>
+			<if test="username!=null">
+				 #{username},
+			</if>
+			<if test="org!=null">
+				 #{org},
+			</if>
+			<if test="expiredDate!=null">
+				 #{expiredDate},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="AclUser">
+		 UPDATE t_user
+ 		 <set> 
+			<if test="accountEnabled != null">
+				 account_enabled = #{accountEnabled},
+			</if>
+			<if test="accountLocked != null">
+				 account_locked = #{accountLocked},
+			</if>
+			<if test="credentialsExpired != null">
+				 credentials_expired = #{credentialsExpired},
+			</if>
+			<if test="description != null">
+				 description = #{description},
+			</if>
+			<if test="fullName != null">
+				 full_name = #{fullName},
+			</if>
+			<if test="mobile != null">
+				 mobile = #{mobile},
+			</if>
+			<if test="password != null">
+				 password = #{password},
+			</if>
+			<if test="userMgrType != null">
+				 user_mgr_type = #{userMgrType},
+			</if>
+			<if test="username != null">
+				 username = #{username},
+			</if>
+			<if test="org != null">
+				 org = #{org},
+			</if>
+			<if test="expiredDate != null">
+				 expired_date = #{expiredDate},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="AclUser">
+		 UPDATE t_user
+		 SET 
+			 account_enabled = #{accountEnabled},
+			 account_locked = #{accountLocked},
+			 credentials_expired = #{credentialsExpired},
+			 description = #{description},
+			 full_name = #{fullName},
+			 mobile = #{mobile},
+			 password = #{password},
+			 user_mgr_type = #{userMgrType},
+			 username = #{username},
+			 org = #{org},
+			 expired_date = #{expiredDate}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>

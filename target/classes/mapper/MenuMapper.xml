@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.MenuMapper">
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	expanded,	is_parent,	leaf,	text,	url,	parent_menu,	sort
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.example.domain.Menu" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM t_menu
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM t_menu
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.example.domain.Menu">
+		 INSERT INTO t_menu
+ 		(id,expanded,is_parent,leaf,text,url,parent_menu,sort) 
+		 VALUES 
+ 		(#{id},#{expanded},#{isParent},#{leaf},#{text},#{url},#{parentMenu},#{sort}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.example.domain.Menu">
+		 INSERT INTO t_menu
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="expanded != null">
+				 expanded,
+			</if>
+			<if test="isParent != null">
+				 is_parent,
+			</if>
+			<if test="leaf != null">
+				 leaf,
+			</if>
+			<if test="text != null">
+				 text,
+			</if>
+			<if test="url != null">
+				 url,
+			</if>
+			<if test="parentMenu != null">
+				 parent_menu,
+			</if>
+			<if test="sort != null">
+				 sort,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="expanded!=null">
+				 #{expanded},
+			</if>
+			<if test="isParent!=null">
+				 #{isParent},
+			</if>
+			<if test="leaf!=null">
+				 #{leaf},
+			</if>
+			<if test="text!=null">
+				 #{text},
+			</if>
+			<if test="url!=null">
+				 #{url},
+			</if>
+			<if test="parentMenu!=null">
+				 #{parentMenu},
+			</if>
+			<if test="sort!=null">
+				 #{sort},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.example.domain.Menu">
+		 UPDATE t_menu
+ 		 <set> 
+			<if test="expanded != null">
+				 expanded = #{expanded},
+			</if>
+			<if test="isParent != null">
+				 is_parent = #{isParent},
+			</if>
+			<if test="leaf != null">
+				 leaf = #{leaf},
+			</if>
+			<if test="text != null">
+				 text = #{text},
+			</if>
+			<if test="url != null">
+				 url = #{url},
+			</if>
+			<if test="parentMenu != null">
+				 parent_menu = #{parentMenu},
+			</if>
+			<if test="sort != null">
+				 sort = #{sort},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.example.domain.Menu">
+		 UPDATE t_menu
+		 SET 
+			 expanded = #{expanded},
+			 is_parent = #{isParent},
+			 leaf = #{leaf},
+			 text = #{text},
+			 url = #{url},
+			 parent_menu = #{parentMenu},
+			 sort = #{sort}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>

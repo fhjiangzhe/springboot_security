@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:oauth2="http://www.springframework.org/schema/security/oauth2"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security.xsd
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/security/oauth2
+http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+    <http security="none" pattern="/static/**" />
+    <http security="none" pattern="/**/*.html" />
+
+    <!-- 方法安全的语法,  mode="aspectj"能确保非Spring创建的实例的安全性（比如使用new操作符创建的）-->
+    <global-method-security  pre-post-annotations="enabled" mode="aspectj" proxy-target-class="false" order="0"/>
+
+    <!-- 网站安全的语法 -->
+    <http auto-config='true' access-decision-manager-ref="accessDecisionManager" use-expressions="true">
+        <logout logout-url="/logout" invalidate-session="true" delete-cookies="JSESSIONID" logout-success-url="/login" />
+
+        <form-login default-target-url="/main" login-page="/login" authentication-failure-url="/login?error=1"
+                    login-processing-url="/j_spring_security_check"  password-parameter="password"
+                    username-parameter="username" />
+
+        <intercept-url pattern="/login/**" access="permitAll()"/>
+        <intercept-url pattern="/login" access="permitAll()" />
+        <intercept-url pattern="/logout" access="permitAll()" />
+        <intercept-url pattern="/timeout" access="permitAll()" />
+        <intercept-url pattern="/**" access="isFullyAuthenticated()" />
+
+        <!-- session管理，invalid-session-url指定使用已经超时的sessionId进行请求需要重定向的页面 -->
+        <!--<session-management invalid-session-url="/timeout"  session-authentication-strategy-ref="sas">-->
+            <!--&lt;!&ndash;<concurrency-control error-if-maximum-exceeded="true" max-sessions="1"&ndash;&gt;-->
+                                 <!--&lt;!&ndash;session-registry-ref="sessionRegistry" />&ndash;&gt;-->
+
+        <!--</session-management>-->
+
+        <session-management invalid-session-url="/timeout"
+                            session-fixation-protection="changeSessionId"> <!-- Session完成(Session Fixation)攻击保护 -->
+            <concurrency-control  max-sessions="1"
+                                 session-registry-ref="sessionRegistry" />
+        </session-management>
+
+        <!--<custom-filter ref="concurrencyFilter" position="CONCURRENT_SESSION_FILTER"/>-->
+
+        <csrf disabled="true"/>
+
+        <!--<remember-me key="webmvc#FD637E6D9C0F1A5A67082AF56CE32485"-->
+                     <!--remember-me-parameter="remember-me" />-->
+    </http>
+
+    <beans:bean id="sessionRegistry"
+                class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+    <!--<beans:bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">-->
+        <!--<beans:property name="maximumSessions" value="1"></beans:property>-->
+        <!--<beans:property name="exceptionIfMaximumExceeded" value="false"></beans:property>-->
+        <!--<beans:constructor-arg name="sessionRegistry" ref="sessionRegistry"></beans:constructor-arg>-->
+    <!--</beans:bean>-->
+
+    <!--&lt;!&ndash; ConcurrentSessionFilter过滤器配置(主要设置账户session过期路径) &ndash;&gt;-->
+    <!--<beans:bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">-->
+        <!--<beans:constructor-arg name="expiredUrl" value="/timeout"></beans:constructor-arg>-->
+        <!--<beans:constructor-arg name="sessionRegistry" ref="sessionRegistry"></beans:constructor-arg>-->
+    <!--</beans:bean>-->
+
+    <!-- 启用表达式 为了后面的投票器做准备 -->
+    <beans:bean
+            class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"
+            id="expressionHandler" />
+    <beans:bean
+            class="org.springframework.security.web.access.expression.WebExpressionVoter"
+            id="expressionVoter">
+        <beans:property name="expressionHandler" ref="expressionHandler" />
+    </beans:bean>
+
+    <beans:bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter">
+        <beans:property name="rolePrefix" value=""></beans:property>
+    </beans:bean>
+
+    <!-- Automatically receives AuthenticationEvent messages -->
+    <beans:bean id="loggerListener"
+                class="org.springframework.security.authentication.event.LoggerListener" />
+    <beans:bean id="authorizationListener"
+                class="org.springframework.security.access.event.LoggerListener" />
+
+    <beans:bean id="passwordEncoder"
+                class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
+
+    <!-- 认证管理器，使用自定义的UserDetailsService，并对密码采用md5加密 -->
+    <authentication-manager alias="authManager">
+        <authentication-provider ref="authenticationProvider"></authentication-provider>
+        <authentication-provider ref="anonymousAuthenticationProvider"></authentication-provider>
+    </authentication-manager>
+
+    <beans:bean id="saltSource" class="com.example.security.MySaltSource"/>
+
+    <!-- 数据提验证 -->
+    <beans:bean id="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+       <beans:property name="userDetailsService" ref="userService"/>
+        <beans:property name="passwordEncoder" ref="passwordEncoder"/>
+        <beans:property name="saltSource" ref="saltSource"/>
+        <beans:property name="hideUserNotFoundExceptions" value="false"/>
+    </beans:bean>
+
+    <!-- 匿名验证 -->
+    <beans:bean id="anonymousAuthenticationProvider" class="org.springframework.security.authentication.AnonymousAuthenticationProvider">
+       <beans:constructor-arg name="key">
+           <beans:value>foobar</beans:value>
+       </beans:constructor-arg>
+    </beans:bean>
+
+    <beans:bean id="security" class="com.example.service.impl.SecurityManagerImpl"/>
+
+    <beans:bean id="userService" class="com.example.security.UserContextService">
+        <beans:property name="scurityManager" ref="security"/>
+     </beans:bean>
+
+    <beans:bean id="accessDecisionManager"
+                class="org.springframework.security.access.vote.AffirmativeBased">
+        <beans:constructor-arg name="decisionVoters">
+            <beans:list>
+                <beans:ref bean="roleVoter"/>
+                <beans:bean
+                        class="org.springframework.security.access.vote.AuthenticatedVoter" />
+                <beans:ref bean="expressionVoter" />
+            </beans:list>
+        </beans:constructor-arg>
+    </beans:bean>
+
+</beans:beans>

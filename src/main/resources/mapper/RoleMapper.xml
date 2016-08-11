@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.RoleMapper">
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	description,	displayref,	name
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.example.domain.Role" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM t_role
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM t_role
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="role">
+		 INSERT INTO t_role
+ 		(id,description,displayref,name) 
+		 VALUES 
+ 		(#{id},#{description},#{displayref},#{name}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.example.domain.Role">
+		 INSERT INTO t_role
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="description != null">
+				 description,
+			</if>
+			<if test="displayref != null">
+				 displayref,
+			</if>
+			<if test="name != null">
+				 name,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="description!=null">
+				 #{description},
+			</if>
+			<if test="displayref!=null">
+				 #{displayref},
+			</if>
+			<if test="name!=null">
+				 #{name},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.example.domain.Role">
+		 UPDATE t_role
+ 		 <set> 
+			<if test="description != null">
+				 description = #{description},
+			</if>
+			<if test="displayref != null">
+				 displayref = #{displayref},
+			</if>
+			<if test="name != null">
+				 name = #{name},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.example.domain.Role">
+		 UPDATE t_role
+		 SET 
+			 description = #{description},
+			 displayref = #{displayref},
+			 name = #{name}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>

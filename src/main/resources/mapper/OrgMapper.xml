@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.OrgMapper">
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	description,	org_name,	org_num,	manager,	parentorg
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.example.domain.Org" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM t_org
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM t_org
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="Org">
+		 INSERT INTO t_org
+ 		(id,description,org_name,org_num,manager,parentorg) 
+		 VALUES 
+ 		(#{id},#{description},#{orgName},#{orgNum},#{manager},#{parentorg}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.example.domain.Org">
+		 INSERT INTO t_org
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="description != null">
+				 description,
+			</if>
+			<if test="orgName != null">
+				 org_name,
+			</if>
+			<if test="orgNum != null">
+				 org_num,
+			</if>
+			<if test="manager != null">
+				 manager,
+			</if>
+			<if test="parentorg != null">
+				 parentorg,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="description!=null">
+				 #{description},
+			</if>
+			<if test="orgName!=null">
+				 #{orgName},
+			</if>
+			<if test="orgNum!=null">
+				 #{orgNum},
+			</if>
+			<if test="manager!=null">
+				 #{manager},
+			</if>
+			<if test="parentorg!=null">
+				 #{parentorg},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.example.domain.Org">
+		 UPDATE t_org
+ 		 <set> 
+			<if test="description != null">
+				 description = #{description},
+			</if>
+			<if test="orgName != null">
+				 org_name = #{orgName},
+			</if>
+			<if test="orgNum != null">
+				 org_num = #{orgNum},
+			</if>
+			<if test="manager != null">
+				 manager = #{manager},
+			</if>
+			<if test="parentorg != null">
+				 parentorg = #{parentorg},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.example.domain.Org">
+		 UPDATE t_org
+		 SET 
+			 description = #{description},
+			 org_name = #{orgName},
+			 org_num = #{orgNum},
+			 manager = #{manager},
+			 parentorg = #{parentorg}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>

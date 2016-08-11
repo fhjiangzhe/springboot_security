@@ -1,0 +1,42 @@
+server:
+  port: 8181
+
+#spring:
+ # data:
+#    mongodb:
+ #     database: sjes-gateway-admin
+  #    uri: mongodb://localhost/${spring.data.mongodb.database}
+
+#endpoints:
+#  cors:
+#    allowed-origins: '*'
+#    allowed-methods: '*'
+#    allowed-headers: '*'
+
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
+
+#admin:
+#  x-auth:
+#    secret-key: 2d1deaea83ee028c12cbbd654896d5d10759d2d9
+#    token-validity-in-seconds: 1800
+#  user:
+#    username: admin
+#    url: jdbc:mysql://srv3.sanjiang.info:3306/sjes-admin?useUnicode=true&characterEncoding=UTF-8
+#     username: sjes
+#     password: sjes
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mac_admin?failOverReadOnly=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true
+    username: root
+    password:
+
+  jpa:
+      database: MYSQL
+      show-sql: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.UserAuthorityMapper">
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	authority,	role_authority,	securityuser
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.example.domain.UserAuthority" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM t_user_authority
+		 WHERE id = #{id}
+	</select>
+	<select id="selectByMap" resultType="com.example.domain.UserAuthority">
+		select <include refid="Base_Column_List" />
+		from t_user_authority
+
+		<where>
+			<if test="securityuser != null">
+				and  securityuser = #{securityuser}
+			</if>
+			<if test="authority != null">
+				and  authority = #{authority}
+			</if>
+			<if test="roleauthority != null">
+				and  role_authority = #{roleAuthority}
+			</if>
+		</where>
+
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM t_user_authority
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.example.domain.UserAuthority">
+		 INSERT INTO t_user_authority
+ 		(id,authority,role_authority,securityuser) 
+		 VALUES 
+ 		(#{id},#{authority},#{roleAuthority},#{securityuser}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.example.domain.UserAuthority">
+		 INSERT INTO t_user_authority
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="authority != null">
+				 authority,
+			</if>
+			<if test="roleAuthority != null">
+				 role_authority,
+			</if>
+			<if test="securityuser != null">
+				 securityuser,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="authority!=null">
+				 #{authority},
+			</if>
+			<if test="roleAuthority!=null">
+				 #{roleAuthority},
+			</if>
+			<if test="securityuser!=null">
+				 #{securityuser},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.example.domain.UserAuthority">
+		 UPDATE t_user_authority
+ 		 <set> 
+			<if test="authority != null">
+				 authority = #{authority},
+			</if>
+			<if test="roleAuthority != null">
+				 role_authority = #{roleAuthority},
+			</if>
+			<if test="securityuser != null">
+				 securityuser = #{securityuser},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.example.domain.UserAuthority">
+		 UPDATE t_user_authority
+		 SET 
+			 authority = #{authority},
+			 role_authority = #{roleAuthority},
+			 securityuser = #{securityuser}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>
