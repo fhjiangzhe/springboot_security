@@ -32,6 +32,6 @@ public class UserController {
 
     @RequestMapping("timeout")
     public String timeout(){
-        return "session超时";
+        return "timeout";
     }
 }
