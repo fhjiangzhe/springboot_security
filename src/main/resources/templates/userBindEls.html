@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring Security Example </title>
+    <script th:src="@{/js/jquery.min.js}"></script>
+
+    <script type="application/javascript">
+        function toSearch(){
+
+            $.ajax( {
+                type : 'post',
+                data : {'searchContent':$('input[name="searchContent"]').val()},
+                url : '/searchUserBindEls',
+                dataType : 'json',
+                cache: false,
+                success : function(data) {
+
+                    if(data.state == "success"){
+
+                        var tables = "";
+
+                        $(data.userBinds).each(function(i,val) {
+                            tables += "<tr>";
+                            tables += "<td>";
+                            tables += val.displayName;
+                            tables += "</td>";
+                            tables += "<td>";
+                            tables += val.displayBindName;
+                            tables += "</td>";
+                            tables == "</tr>";
+
+                        });
+
+                        $("#tbody").html(tables);
+                    }else{
+                        $("#tbody").html("<td>无结果</td>");
+                    }
+
+                },
+                error : function() {
+                    alert("error");
+                }
+            });
+        }
+    </script>
+
+</head>
+<body>
+
+<input type="text" name="searchContent"/><input type="button" value="搜索" onclick="toSearch()"/>
+
+<table>
+    <thead>
+    <tr>
+        <th>搜索结果:</th>
+    </tr>
+    </thead>
+    <tbody th:remove="all-but-first" id="tbody">
+    <!--<tr th:each="userBind : ${userBinds}">-->
+        <!--<td th:text="${userBind.importOrgName}"></td>-->
+        <!--<td th:utext="${userBind.displayName}"></td>-->
+        <!--<td th:text="${userBind.bindOrgName}"></td>-->
+    <!--</tr>-->
+    </tbody>
+</table>
+</body>
+</html>

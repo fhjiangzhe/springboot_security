@@ -38,7 +38,7 @@ public class ThreadServiceImpl implements ThreadService , ApplicationListener<Co
     @Scheduled(fixedRate = 50000)
     public void start() {
 //        try {
-//            ArrayBlockingQueue<UserBindEntity> queue = new ArrayBlockingQueue<UserBindEntity>(100);
+//            ArrayBlockingQueue<UserBindElsEntity> queue = new ArrayBlockingQueue<UserBindElsEntity>(100);
 //            ConcurrentHashMap<String, Integer> counts = new ConcurrentHashMap<String, Integer>();
 //
 //            for(int i=0;i<NUM_COUNTERS;++i){

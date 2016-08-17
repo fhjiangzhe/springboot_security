@@ -1,8 +1,12 @@
-package com.example.domain;
+package com.example.domain.elasticsearch;
 
-import org.hibernate.annotations.DynamicInsert;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldIndex;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -13,49 +17,14 @@ import java.util.Date;
 * @author 史超
 * @date 2015年12月31日 下午3:42:38
  */
-@Entity
-@Table(name ="fp_user_bind")
-@DynamicInsert
-public class UserBindEntity implements Serializable {
+@Document(indexName = "impdata",type = "fp_user_bind")
+public class UserBindElsEntity implements Serializable {
 	/** 
 	* @Fields serialVersionUID : TODO(用一句话描述这个变量表示什么) 
 	*/ 
 	private static final long serialVersionUID = -3839273372690126464L;
-	/** 
-	* @Fields serialVersionUID : TODO(用一句话描述这个变量表示什么) 
-	*/ 
-	public enum BindStatus{
-		NOCOOPERATION("掌柜与掌门没有建立关系",-1),SELF("当前掌门人为本公司",-30),
-		AUDITING("待合作",0),PASS("已合作",10),CLOSE("庄家关闭",11),DENY("拒绝",-10),UNBIND("解除绑定",-20);
-		
-		private String name;
-		private Integer type;
-		private BindStatus(String name, Integer type) {
-    		this.name = name;
-    		this.type = type;
-    	}
-
-    	public String getName() {
-    		return this.name;
-    	}
-
-    	public Integer getType() {
-    		return type;
-    	}
-		
-	}
-	public UserBindEntity() {
-		// TODO Auto-generated constructor stub
-	}
-	
-	public UserBindEntity(Integer importOrgId, Integer bindOrgId) {
-		super();
-		this.importOrgId = importOrgId;
-		this.bindOrgId = bindOrgId;
-	}
 
 	@Id
-	@GeneratedValue
 	private Integer id;
 	/**
 	 * 导入方公司orgId
@@ -64,6 +33,7 @@ public class UserBindEntity implements Serializable {
 	/**
 	 * 导入方公司orgName
 	 */
+	@Field(analyzer = "ik",searchAnalyzer = "ik", type = FieldType.String)
 	private String importOrgName;
 	/**
 	 * 导出方公司orgid
@@ -72,6 +42,7 @@ public class UserBindEntity implements Serializable {
 	/**
 	 * 导出方公司名称 htg 2015年9月10日 YJHL201509A
 	 */
+	@Field(analyzer = "ik",searchAnalyzer = "ik", type = FieldType.String)
 	private String bindOrgName;
 	/**
 	 * 导出方公司域名
@@ -88,6 +59,7 @@ public class UserBindEntity implements Serializable {
 	/**
 	 * 申请时间
 	 */
+	@Field(type = FieldType.Date)
 	private Date applyTime;
 	/**
 	 * 申请人
@@ -100,6 +72,7 @@ public class UserBindEntity implements Serializable {
 	/**
 	 * 审核时间
 	 */
+	@Field(type = FieldType.Date)
 	private Date auditTime;
 	/**
 	 * 审核人
@@ -125,62 +98,18 @@ public class UserBindEntity implements Serializable {
 	 * 理由
 	 */
 	private String reason;
-	
-	/**
-	 * 外部联系人
-	 */
-	@Transient
-	private String contactName;
-	
-	/**
-	 * 外部联系人电话
-	 */
-	@Transient
-	private String contactMobile;
-	/**
-	 * 客服
-	 */
-	@Transient
-	private String servicerName;
-	//webIm的账号
-	@Transient
-	private String imId;
-	//webIm的密码
-	@Transient
-	private String imPwd;
-	//webIm的联系人姓名
-	@Transient
-	private String employeeName;
-	//是否显示webIm图标
-	@Transient
-	private Boolean isShow;
-	//老状态
-	@Transient
-	private Integer oldStatus;
 
-	//申请来源,0代表网页端;1代表客户端
-	@Transient
+	/**
+	 * 申请来源,0代表网页端;1代表客户端
+	 */
 	private Integer applySource;
-	@Transient
-	private Integer importStatus;
-	@Transient
-	private String imOnLineStatus;
 
-	@Transient
-	public boolean isPoisonPill() { return false; }
+	@Field(index = FieldIndex.no,type = FieldType.String)
+	private String displayName; // 展示的名称(高亮)
 
-	/**
-	 * @return importStatus
-	 */
-	public Integer getImportStatus() {
-		return importStatus;
-	}
-	/**
-	 * @param importStatus 赋值为  importStatus
-	 */
-	public void setImportStatus(Integer importStatus) {
-		this.importStatus = importStatus;
-	}
+	@Field(index = FieldIndex.no,type = FieldType.String)
+	private String displayBindName; // 展示的名称(高亮)
+
 	/**
 	 * @return the applySource
 	 */
@@ -193,18 +122,7 @@ public class UserBindEntity implements Serializable {
 	public void setApplySource(Integer applySource) {
 		this.applySource = applySource;
 	}
-	/**
-	 * @return oldStatus
-	 */
-	public Integer getOldStatus() {
-		return oldStatus;
-	}
-	/**
-	 * @param oldStatus 赋值为  oldStatus
-	 */
-	public void setOldStatus(Integer oldStatus) {
-		this.oldStatus = oldStatus;
-	}
+
 	/**
 	 * @return id
 	 */
@@ -296,7 +214,7 @@ public class UserBindEntity implements Serializable {
 		return effectStatus;
 	}
 	/**
-	 * @param effect_status 赋值为  effect_status
+	 * @param
 	 */
 	public void setEffectStatus(Integer effectStatus) {
 		this.effectStatus = effectStatus;
@@ -409,90 +327,7 @@ public class UserBindEntity implements Serializable {
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
-	/**
-	 * @return contactName
-	 */
-	public String getContactName() {
-		return contactName;
-	}
-	/**
-	 * @param contactName 赋值为  contactName
-	 */
-	public void setContactName(String contactName) {
-		this.contactName = contactName;
-	}
-	/**
-	 * @return contactMobile
-	 */
-	public String getContactMobile() {
-		return contactMobile;
-	}
-	/**
-	 * @param contactMobile 赋值为  contactMobile
-	 */
-	public void setContactMobile(String contactMobile) {
-		this.contactMobile = contactMobile;
-	}
-	/**
-	 * @return servicerName
-	 */
-	public String getServicerName() {
-		return servicerName;
-	}
-	/**
-	 * @param servicerName 赋值为  servicerName
-	 */
-	public void setServicerName(String servicerName) {
-		this.servicerName = servicerName;
-	}
-	/**
-	 * @return imId
-	 */
-	public String getImId() {
-		return imId;
-	}
-	/**
-	 * @param imId 赋值为  imId
-	 */
-	public void setImId(String imId) {
-		this.imId = imId;
-	}
-	/**
-	 * @return imPwd
-	 */
-	public String getImPwd() {
-		return imPwd;
-	}
-	/**
-	 * @param imPwd 赋值为  imPwd
-	 */
-	public void setImPwd(String imPwd) {
-		this.imPwd = imPwd;
-	}
-	/**
-	 * @return employeeName
-	 */
-	public String getEmployeeName() {
-		return employeeName;
-	}
-	/**
-	 * @param employeeName 赋值为  employeeName
-	 */
-	public void setEmployeeName(String employeeName) {
-		this.employeeName = employeeName;
-	}
-	/**
-	 * @return isShow
-	 */
-	public Boolean getIsShow() {
-		return isShow;
-	}
-	/**
-	 * @param isShow 赋值为  isShow
-	 */
-	public void setIsShow(Boolean isShow) {
-		this.isShow = isShow;
-	}
+
 	/**
 	 * @return applyUserName
 	 */
@@ -505,12 +340,20 @@ public class UserBindEntity implements Serializable {
 	public void setApplyUserName(String applyUserName) {
 		this.applyUserName = applyUserName;
 	}
-	public String getImOnLineStatus() {
-		return imOnLineStatus;
+
+	public String getDisplayName() {
+		return displayName;
 	}
-	public void setImOnLineStatus(String imOnLineStatus) {
-		this.imOnLineStatus = imOnLineStatus;
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
-	
-	
+
+	public String getDisplayBindName() {
+		return displayBindName;
+	}
+
+	public void setDisplayBindName(String displayBindName) {
+		this.displayBindName = displayBindName;
+	}
 }

@@ -20,9 +20,9 @@ http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
     <http auto-config='true' access-decision-manager-ref="accessDecisionManager" use-expressions="true">
         <logout logout-url="/j_spring_security_logout" invalidate-session="true" delete-cookies="JSESSIONID" logout-success-url="/login" />
 
-        <form-login  default-target-url="/main" login-page="/login" authentication-failure-url="/login?error=1"
+        <form-login  default-target-url="/userBindEls" login-page="/login" authentication-failure-url="/login?error=1"
                     login-processing-url="/j_spring_security_check"  password-parameter="password"
-                    username-parameter="username" />
+                    username-parameter="username" always-use-default-target="true"/>
 
         <intercept-url pattern="/login/**" access="permitAll()"/>
         <intercept-url pattern="/login" access="permitAll()" />
