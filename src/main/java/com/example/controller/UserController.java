@@ -21,11 +21,9 @@ import org.springframework.data.elasticsearch.core.SearchResultMapper;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -34,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
+
 
 /**
  * Created by JiangZhe on 16/7/30.
@@ -92,7 +91,6 @@ public class UserController {
 
         try {
             Page<UserBindElsEntity> search = new PageImpl<UserBindElsEntity>(Lists.newArrayList());
-
             if(!StringUtils.isEmpty(searchContent)) {
                 SearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(
                         multiMatchQuery(searchContent, "importOrgName", "bindOrgName").analyzer("ik").type(MultiMatchQueryBuilder.Type.BEST_FIELDS).tieBreaker(0.3f))
