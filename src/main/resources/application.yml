@@ -1,6 +1,8 @@
 server:
   port: 8181
 
+
+
 #spring:
  # data:
 #    mongodb:
@@ -26,6 +28,10 @@ server:
 #    url: jdbc:mysql://srv3.sanjiang.info:3306/sjes-admin?useUnicode=true&characterEncoding=UTF-8
 #     username: sjes
 #     password: sjes
+
+
+
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -40,3 +46,10 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     cache: false
+
+  data:
+    elasticsearch:
+      cluster-name: my-application
+      cluster-nodes: 127.0.0.1:9300
+
+
