@@ -6,10 +6,15 @@ import com.example.repository.elasticsearch.UserBindRepository;
 import com.example.security.UserContextHelper;
 import com.google.common.collect.Lists;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.suggest.SuggestResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightBuilder;
 import org.elasticsearch.search.highlight.HighlightField;
+import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchResultMapper;
+import org.springframework.data.elasticsearch.core.completion.Completion;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Controller;
@@ -30,7 +36,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-
 import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
 
 
@@ -152,6 +157,27 @@ public class UserController {
         return result;
     }
 
+    @RequestMapping("suggest")
+    @ResponseBody
+    public Map suggest(String prefix){
+
+        Map result = new HashMap<>();
+
+        try {
+            if(!StringUtils.isEmpty(prefix)){
+                List<String> suggests = getCompletionSuggest(prefix);
+                result.put("suggests",suggests);
+            }
+            result.put("state","success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("state","error");
+        }
+
+        return result;
+    }
+
+
     /**
      * Map转Object
      *
@@ -177,7 +203,7 @@ public class UserController {
 
             if (map.containsKey(propertyName)) {
                 Object value = map.get(propertyName);
-                if (value != null) {
+                if (value != null && !(type.endsWith("Completion"))) {
                     if (type.endsWith("Long")) {
                         descriptor.getWriteMethod().invoke(obj, Long.valueOf(value.toString()));
                     } else if (type.endsWith("Double")) {
@@ -191,5 +217,33 @@ public class UserController {
             }
         }
         return obj;
+    }
+
+    /**
+     * 搜索建议，自动补全搜索结结果
+     * @param prefix 搜索前缀词
+     * @return 建议列表
+     */
+    private List<String> getCompletionSuggest(String prefix) {
+
+        CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("test-suggest");
+        suggestionsBuilder.text(prefix);
+        suggestionsBuilder.field("suggest");
+        suggestionsBuilder.size(10);
+
+        SuggestResponse suggestResponse = elasticsearchTemplate.suggest(suggestionsBuilder, UserBindElsEntity.class);
+        List<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> list = suggestResponse.getSuggest()
+                .getSuggestion("test-suggest").getEntries();
+        List<String> suggests = Lists.newArrayList();
+        if (list == null) {
+            return null;
+        } else {
+            for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> e : list) {
+                for (Suggest.Suggestion.Entry.Option option : e) {
+                    suggests.add(option.getText().toString());
+                }
+            }
+            return suggests;
+        }
     }
 }

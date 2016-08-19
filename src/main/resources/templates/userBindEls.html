@@ -6,6 +6,43 @@
     <script th:src="@{/js/jquery.min.js}"></script>
 
     <script type="application/javascript">
+
+
+        $(function(){
+
+            $('input[name="searchContent"]').on("keyup",function(){
+                $.ajax({
+                    type : 'post',
+                    data : {'prefix':$(this).val()},
+                    url : '/suggest',
+                    dataType : 'json',
+                    cache: false,
+                    success : function(data){
+                        if(data.state == "success"){
+
+                            var suggestHtml = "";
+                            $(data.suggests).each(function(i,val){
+
+                                if(suggestHtml == "") suggestHtml += "<span>"+val+"</span>";
+                                 else  suggestHtml += "<br/>"+"<span>"+val+"</span>";
+                            });
+
+                            $("#suggests").html(suggestHtml);
+                        }
+                    },
+                    error : function() {
+                        alert("error");
+                    }
+                })
+            });
+
+
+            $("#suggests").delegate("span","click",function(){
+                $('input[name="searchContent"]').val($(this).html());
+            });
+
+        })
+
         function toSearch(){
 
             $.ajax( {
@@ -48,7 +85,12 @@
 </head>
 <body>
 
-<input type="text" name="searchContent"/><input type="button" value="搜索" onclick="toSearch()"/>
+<div id="searchForm">
+ <input type="text" name="searchContent"/><input type="button" value="搜索" onclick="toSearch()"/>
+</div>
+<div id="suggests">
+
+</div>
 
 <table>
     <thead>

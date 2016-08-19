@@ -11,8 +11,14 @@ import com.example.repository.MasterRepository;
 import com.example.repository.elasticsearch.ArticleSearchRepository;
 import com.example.repository.elasticsearch.UserBindRepository;
 import com.google.common.collect.Lists;
+import org.elasticsearch.action.suggest.SuggestResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.search.highlight.HighlightBuilder;
+import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestionFuzzyBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.completion.Completion;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
@@ -42,6 +49,9 @@ public class DemoApplicationTests {
 
 	@Autowired
 	private ElasticsearchTemplate elasticsearchTemplate;
+
+	@Autowired
+	private Client client;
 
 	@Test
 	public void contextLoads() {
@@ -173,9 +183,9 @@ public class DemoApplicationTests {
 	public void saveUserBindEls(){
 		UserBindElsEntity userBindElsEntity = new UserBindElsEntity();
 		userBindElsEntity.setId(2);
-		userBindElsEntity.setImportOrgId(10002);
+		userBindElsEntity.setImportOrgId(10003);
 		userBindElsEntity.setImportOrgName("宁波江北掌柜0");
-		userBindElsEntity.setBindOrgId(10003);
+		userBindElsEntity.setBindOrgId(10004);
 		userBindElsEntity.setBindOrgName("鄞州掌门1");
 		userBindElsEntity.setApplyTime(new Date());
 		userBindElsEntity.setApplySource(0);
@@ -184,6 +194,14 @@ public class DemoApplicationTests {
 		userBindElsEntity.setBindStatus(10);
 		userBindElsEntity.setEffectStatus(1);
 		userBindElsEntity.setDomain("http://www.baidu.com");
+
+		Completion suggest = new Completion(new String[]{userBindElsEntity.getImportOrgName(), userBindElsEntity.getBindOrgName()});
+	//	suggest.setOutput(userBindElsEntity.getImportOrgName()+"  "+userBindElsEntity.getBindOrgName());
+//		suggest.setPayload(payload);
+//		suggest.setWeight(weight);
+
+		userBindElsEntity.setSuggest(suggest);
+
 		userBindRepository.save(userBindElsEntity);
 	}
 
@@ -209,6 +227,39 @@ public class DemoApplicationTests {
 	@Test
 	public void removeUserBindEls(){
 		userBindRepository.deleteAll();
+	}
+
+	@Test
+	public void suggest(){
+		List<String> completionSuggest = getCompletionSuggest("北");
+
+		for (String s : completionSuggest) {
+			System.out.println(s);
+		}
+	}
+
+
+	private List<String> getCompletionSuggest(String prefix) {
+
+		CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("test-suggest");
+		suggestionsBuilder.text(prefix);
+		suggestionsBuilder.field("suggest");
+		suggestionsBuilder.size(10);
+
+		SuggestResponse suggestResponse = elasticsearchTemplate.suggest(suggestionsBuilder, UserBindElsEntity.class);
+		List<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> list = suggestResponse.getSuggest()
+				.getSuggestion("test-suggest").getEntries();
+		List<String> suggests = Lists.newArrayList();
+		if (list == null) {
+			return null;
+		} else {
+			for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option> e : list) {
+				for (Suggest.Suggestion.Entry.Option option : e) {
+					suggests.add(option.getText().toString());
+				}
+			}
+			return suggests;
+		}
 	}
 
 

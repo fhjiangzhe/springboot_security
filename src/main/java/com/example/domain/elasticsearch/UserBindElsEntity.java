@@ -2,10 +2,8 @@ package com.example.domain.elasticsearch;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldIndex;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
+import org.springframework.data.elasticsearch.core.completion.Completion;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -109,6 +107,17 @@ public class UserBindElsEntity implements Serializable {
 
 	@Field(index = FieldIndex.no,type = FieldType.String)
 	private String displayBindName; // 展示的名称(高亮)
+
+	@CompletionField(maxInputLength = 100)
+	private Completion suggest;
+
+	public Completion getSuggest() {
+		return suggest;
+	}
+
+	public void setSuggest(Completion suggest) {
+		this.suggest = suggest;
+	}
 
 	/**
 	 * @return the applySource
